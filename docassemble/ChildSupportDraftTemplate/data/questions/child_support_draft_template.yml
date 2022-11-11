@@ -69,9 +69,19 @@ code: |
   # allowed_courts = interview_metadata["child_support_draft_template"]["allowed courts"]
   nav.set_section("review_child_support_draft_template")
   user_role = "na"
-  interim_motion
-  Look_for_your_name_in_Courtview
-  Do_you_want_information_about_how_to_fill_out_the_papers_you_need_to_respond
+  if existing_case == 'open': 
+    if user_role_in_case == 'defendant': 
+      need_to_respond
+      interim_motion
+    elif user_role_in_case == 'closed':
+      child_support_draft_template_download
+    else:
+      interim_motion
+  elif existing_case == 'none':
+    paternity
+  else:
+    courtview
+ 
   set_progress(14)
   Interim_child_support_order
   Gen_Information_Forms
@@ -120,45 +130,44 @@ question: |
   Asking for Child Support
 subquestion: |
   This Guided Assistant asks you questions and uses your answers to build a Personal Action Plan - a list of steps to help you ask for child support in Alaska.
- Do you have an existing court case?
- 
- 
+  ### Do you have an existing court case? ###
+  Do you have a court case for custody, divorce, or legal separation?
 fields:
-  - "Do you have a court case for custody, divorce, or legal separation?": existing_case
+  - no label: existing_case
     input type: radio
     choices:
       - Yes: open
       - No: none
       - "I do not know": unknown
-  - no label: user_role_in_case
+  - What's going on?: user_role_in_case
     input type: radio
     choices:
       - "Yes. The other parent started a case and I have to file papers to respond.": defendant
       - "Yes. I filed papers to start the case and am waiting for the other side to respond.": plaintiff
       - "Yes.  We have an open case.": joint
       - "Yes, but the case ended and we got our final paperwork.": closed
-    js show if: 
-      existing_case === 'open'
+    js show if:
+      val('existing_case') == 'open'
   - note: |
      
      #### <i class="fa-regular fa-lightbulb"></i> What if I need information about getting child support in another state? ####
      Your Personal Action Plan explains how child support works only in Alaska.  To find out about child support in other states find their [court](https://www.ncsc.org/information-and-resources/state-court-websites), [legal aid](https://lawhelp.org), [child support agency or tribal child support agency website](https://www.acf.hhs.gov/css/contact-information/state-and-tribal-child-support-agency-contacts).
 ---
 code: |
-  if existing case == “open”: 
+  if existing_case == 'open': 
     if user_role_in_case in ('defendant','plaintiff','joint'):
       basics = True
     else:
       modify = True
 ---
 
-  - "Interim motion": interim_motion
-    datatype: yesno
-  - "Interview title": interview_title
-  - "Wrong path tf": wrong_path_tf
-    datatype: yesno
-  - "Do not know": do_not_know
-    datatype: yesno
+  #  - "Interim motion": interim_motion
+  #    datatype: yesno
+  #  - "Interview title": interview_title
+  #  - "Wrong path tf": wrong_path_tf
+  #    datatype: yesno
+  #  - "Do not know": do_not_know
+  #    datatype: yesno
 ---
 id: Look for your name in Courtview
 question: |
@@ -176,42 +185,50 @@ continue button field: Look_for_your_name_in_Courtview
 id: Do you want information about how to fill out the papers you need to respond
 question: |
   Do you want information about how to fill out the papers you need to respond?
-subquestion: |
-  Yes.  Dropdown below. 
-  No  Go to Interim child support order 
-  If yes, dropdown:
-  o	Divorce [TEM respond div] [case_type == “divorce”] goto Interim child support order
-  o	Legal separation [TEM respond legal custody] [case_type == “separation”] goto Interim child support order
-  o	Custody [TEM respond cus] [case_type == “custody”] goto Interim child support order
-continue button field: Do_you_want_information_about_how_to_fill_out_the_papers_you_need_to_respond
+fields:
+  - no label: need_to_respond
+    datatype: yesnoradio
+  - "what kind of case?": case_type
+    input type: radio
+    choices:
+      - "Divorce": divorce
+      - "Legal separation": separation
+      - "Custody": custody
+    show if:
+      need_to_respond
 ---
 id: Interim child support order
 question: |
   Interim child support order
 subquestion: |
-  % if existing_case == “needs response”:
-       % if need_response_info
+ if existing_case == “defendant”:
+   if need_response_info:
   Your Personal Action Plan now includes Information about filing papers to respond in your case. 
-       % endif
-  % endif
+   endif
+ endif
   
   The judge will enter a final child support order at the end of your case, and pick the date child support should start.  Child support is usually owed when parents do not live together.  Sometimes when a case ends, one parent owes the other parent back child support.  
   
   If you do not want to wait until the end of your case, you can ask the judge for an “interim” Child Support order.  
   
   What do you want to do?
-  	Wait for the judge to order child support at the end of my case. Goto Gen information forms
-  	Ask the judge to order child support while my case is going on. – [TEM interim motions [affidavit  instructions_tf] [order_instructions_tf]  – Go to kids 
-  Learn more
-  Prompt:
-  Text: An interim order is any order the judge makes before they make the final order or decree. 
-  The judge can make short-term decisions about child support, the parenting plan, 
-  % if exisitng_case == ‘yes’: 
-       % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
-       % endif
-  % endif. 
-  The final order may be entirely different.
-continue button field: Interim_child_support_order
+  fields:
+    - no label: interim_motion
+      input type: radio
+      choices:
+        - "Wait for the judge to order child support at the end of my case. Goto Gen information forms": wait Goto Gen information forms
+        - "Ask the judge to order child support while my case is going on. –  TEM interim motions  affidavit  instructions_tf   order_instructions_tf   – Go to kids": ask for interim order
+    - note: |
+     
+      #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
+      An interim order is any order the judge makes before they make the final order or decree. 
+      The judge can make short-term decisions about child support, the parenting plan, 
+      # % if exisitng_case == ‘yes’: 
+      #      % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
+      #      % endif
+      # % endif. 
+      The final order may be entirely different.
+continue button field: interim_motion
 ---
 id: Gen Information Forms
 question: |
@@ -257,7 +274,7 @@ subquestion: |
   •	was conceived by in vitro fertilization, or surrogacy? 
   A person who adopts a child is the child’s legal parent.  You usually cannot “undo” an adoption to “disestablish paternity”.  
   These situations can be complicated.  If you have questions, it is a good idea to talk to a lawyer.
-continue button field: Paternity
+continue button field: paternity
 ---
 id: Ask CSSD or the Court for a child support order
 question: |
@@ -292,7 +309,7 @@ id: Ask the court for Child Support
 question: |
   Ask the court for Child Support
 subquestion: |
-  % if I how_to_ask_for_child_support_from (page 8) == ‘Both’:
+  # % if I how_to_ask_for_child_support_from (page 8) == ‘Both’:
   Your Personal Action Plan includes information about how to ask the Alaska Child Support Services Division (CSSD) for a child support order. % endif
   
   If you want the court to order child support, you must start a court case.
@@ -350,10 +367,10 @@ subquestion: |
   Prompt:
   Text: An interim order is any order the judge makes before they make the final order or decree. 
   The judge can make short-term decisions about child support, the parenting plan, 
-  % if exisitng_case == ‘yes’: 
-       % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
-       % endif
-  % endif. 
+  # % if exisitng_case == ‘yes’: 
+  #      % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
+  #      % endif
+  # % endif. 
   The final order may be entirely different.
 continue button field: Interim_child_support_order_2
 ---
@@ -374,10 +391,10 @@ subquestion: |
   Prompt:
   Text: An interim order is any order the judge makes before they make the final order or decree. 
   The judge can make short-term decisions about child support, the parenting plan, 
-  % if exisitng_case == ‘yes’: 
-       % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
-       % endif
-  % endif. 
+  # % if exisitng_case == ‘yes’: 
+  #      % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
+  #      % endif
+  # % endif. 
   The final order may be entirely different.
 continue button field: Interim_child_support_order_3
 ---
@@ -509,7 +526,7 @@ progress: 100
 ---
 # ALDocument objects specify the metadata for each template
 objects:
-  - child_support_draft_template_Post_interview_instructions: ALDocument.using(title="Instructions", filename="child_support_draft_template_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+  #  - child_support_draft_template_Post_interview_instructions: ALDocument.using(title="Instructions", filename="child_support_draft_template_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
   - child_support_draft_template_attachment: ALDocument.using(title="Asking for Child Support", filename="child_support_draft_template", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
@@ -521,10 +538,10 @@ objects:
 # used for "preview" and "final" keys, and logic in the template checks the value of 
 # `i` to show or hide the user's signature
 attachments:
-  - name: Post-interview-Instructions
-    filename: child_support_draft_template_next_steps
-    docx template file: child_support_draft_template_next_steps.docx
-    variable name: child_support_draft_template_Post_interview_instructions[i]
+  #  - name: Post-interview-Instructions
+  #    filename: child_support_draft_template_next_steps
+  #    docx template file: child_support_draft_template_next_steps.docx
+  #    variable name: child_support_draft_template_Post_interview_instructions[i]
   - name: child support draft template
     filename: child_support_draft_template
     variable name: child_support_draft_template_attachment[i]
