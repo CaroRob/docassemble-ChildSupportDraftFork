@@ -69,25 +69,36 @@ code: |
   # allowed_courts = interview_metadata["child_support_draft_template"]["allowed courts"]
   nav.set_section("review_child_support_draft_template")
   user_role = "na"
-  if existing_case == 'open': 
-    if user_role_in_case == 'defendant': 
+  if existing_case == 'open':								
+    if user_role_in_case == 'defendant':							
       need_to_respond
-      interim_motion
-    elif user_role_in_case == 'closed':
-      child_support_draft_template_download
-    else:
-      interim_motion
-  elif existing_case == 'none':
+  #    if interim_motion == 'wait':						
+  #      if general_information_about_forms:					
+  #        kids				
+  #      else:					
+  #        child_support_draft_template_download				
+  #    else:						
+  #      kids					
+  #      child_support_draft_template_download					
+  #  elif user_role_in_case == 'closed':							
+  #    child_support_draft_template_download						
+  #   set_progress(14)								
+  #  else:							
+  #    if interim_motion == 'wait':						
+  #      if general_information_about_forms:					
+  #        kids				
+  #      else:					
+  #        child_support_draft_template_download				
+  #    else:						
+  #      kids					
+  #      child_support_draft_template_download					
+  #   set_progress(28)								
+  elif existing_case == 'none':								
     paternity
+  #    if how_to_ask_for_child_support_from == 'cssd':
+  #      child_support_draft_template_download
   else:
     courtview
- 
-  set_progress(14)
-  Interim_child_support_order
-  Gen_Information_Forms
-  kids
-  set_progress(28)
-  Paternity
   Ask_CSSD_or_the_Court_for_a_child_support_order
   Ask_the_court_for_Child_Support
   set_progress(42)
@@ -188,11 +199,11 @@ question: |
 fields:
   - no label: need_to_respond
     datatype: yesnoradio
-  - "what kind of case?": case_type
+  - "what kind of case?": case_type 
     input type: radio
     choices:
       - "Divorce": divorce
-      - "Legal separation": separation
+      - "Legal separation": legal separation
       - "Custody": custody
     show if:
       need_to_respond
@@ -201,80 +212,96 @@ id: Interim child support order
 question: |
   Interim child support order
 subquestion: |
- if existing_case == “defendant”:
-   if need_response_info:
-  Your Personal Action Plan now includes Information about filing papers to respond in your case. 
-   endif
- endif
+  % if existing_case == 'open':
+    % if user_role_in_case == 'defendant': 
+      % if need_to_respond:
+      Your Personal Action Plan now includes information about filing papers to respond in your ${ case_type } case. 
+      % endif
+    % endif
+  % endif
   
-  The judge will enter a final child support order at the end of your case, and pick the date child support should start.  Child support is usually owed when parents do not live together.  Sometimes when a case ends, one parent owes the other parent back child support.  
+  The judge will enter a final child support order at the end of your case, and pick the date child support should start.  
   
-  If you do not want to wait until the end of your case, you can ask the judge for an “interim” Child Support order.  
+  Child support is usually owed when parents do not live together.  
   
-  What do you want to do?
+  Sometimes, when a case ends, one parent owes the other parent back child support.  
+  
+  If you do not want to wait until the end of your case, you can ask the judge for an “interim” Child Support order.    
   fields:
-    - no label: interim_motion
+    - "What do you want to do?": interim_motion
       input type: radio
       choices:
-        - "Wait for the judge to order child support at the end of my case. Goto Gen information forms": wait Goto Gen information forms
-        - "Ask the judge to order child support while my case is going on. –  TEM interim motions  affidavit  instructions_tf   order_instructions_tf   – Go to kids": ask for interim order
+        - "Wait for the judge to order child support at the end of my case. Goto Gen information forms": wait
+        - "Ask the judge to order child support while my case is going on. TEM interim motions  affidavit  instructions_tf   order_instructions_tf  Go to kids": ask 
     - note: |
      
       #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
       An interim order is any order the judge makes before they make the final order or decree. 
       The judge can make short-term decisions about child support, the parenting plan, 
-      # % if exisitng_case == ‘yes’: 
-      #      % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
-      #      % endif
-      # % endif. 
+      % if existing_case == 'open': 
+        % if case_type in('divorce', 'dissolution', 'legal separation'):
+         possession of the family home, attorney fees, spousal support or payment of debts
+        % endif
+      % endif
+      . 
       The final order may be entirely different.
-continue button field: interim_motion
 ---
-id: Gen Information Forms
+id: info about filling out child support forms
 question: |
-  Gen Information Forms
+  Filling out the court's child support forms
 subquestion: |
-  Do you want general information about filling out the court’s child support forms?
-  Do you want your Personal Action Plan to include directions for filling out the court’s child support forms?
-  Yes – [affidavit  instructions_tf] [order_instructions_tf]  [Order TF] Go to Kids
-  No – PDF
-continue button field: Gen_Information_Forms
+  Do you want your Personal Action Plan to include directions for filling out the court's child support forms?
+yesno: general_information_about_forms
 ---
 id: kids
 question: |
   kids
 subquestion: |
   How many children will your child support order to cover? 
-    
-  •	One [1 child TF PDF
-  •	More than one [more child TF] PDF
-  Learn more
-   Child support is to support  children  who are under 18.  
-  Child support orders are usually last until your child turns 19 if: 
-  1.	They still live with you or their other parent and
-  2.	They are finishing high school.
-continue button field: kids
+fields:
+  - "Number of children?": number_of_children
+    input type: radio
+    choices:
+      - "1 child": one
+      - "More than 1 child": more than one
+  - note: |
+      #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
+      
+      Child support is to support  children  who are under 18.
+
+      Child support orders usually last until your child turns 19 if: 
+
+      1.They still live with you or their other parent and
+      2. They are finishing high school.
 ---
 id: Paternity
 question: |
   Paternity
 subquestion: |
-  You and your child’s other legal parent are responsible for financially supporting your child.  A child’s biological father is generally the legal father.
+  You and your child's other legal parent are responsible for financially supporting your child.  
+  
+  A childs biological father is generally their legal father.
+
   If parents disagree, either parent can ask the court to decide.  
-  •	Proving someone is the biological father of a child is called establishing paternity.  
-  •	Proving someone is not the biological father is called disestablishing paternity.  
-  Do you want to add information about establishing or disestablishing paternity to your Personal Action Plan? 
-  •	Yes Paternity [paternity get child support] Go to ask CSSD or court 
-  •	No Go to ask CSSD or court
-  Learn More:  
-  Is the law different if my child: 
-  •	is adopted, 
-  •	has parents who are the same gender,
-  •	has transgender parents, or
-  •	was conceived by in vitro fertilization, or surrogacy? 
-  A person who adopts a child is the child’s legal parent.  You usually cannot “undo” an adoption to “disestablish paternity”.  
-  These situations can be complicated.  If you have questions, it is a good idea to talk to a lawyer.
-continue button field: paternity
+ 
+  * Proving someone is the **biological** father of a child is called establishing paternity.
+  * Proving someone is not the **biological** father is called disestablishing paternity. 
+
+  Do you want to add information about establishing or disestablishing paternity to your Personal Action Plan?
+  yesno: paternity
+  - note: |
+      #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
+      Is the law different if my child":
+
+      *	is adopted, 
+      *	has parents who are the same gender,
+      *	has transgender parents, or
+      * was conceived by in vitro fertilization, or surrogacy?
+
+      A person who adopts a child is the child's legal parent.  
+      Usually, you cannot “undo” an adoption to “disestablish paternity”.  
+
+      These situations can be complicated.  If you have questions, it is a good idea to talk to a lawyer.
 ---
 id: Ask CSSD or the Court for a child support order
 question: |
