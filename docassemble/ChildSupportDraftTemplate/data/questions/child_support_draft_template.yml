@@ -72,31 +72,31 @@ code: |
   if existing_case == 'open':								
     if user_role_in_case == 'defendant':							
       need_to_respond
-  #    if interim_motion == 'wait':						
-  #      if general_information_about_forms:					
-  #        kids				
-  #      else:					
-  #        child_support_draft_template_download				
-  #    else:						
-  #      kids					
-  #      child_support_draft_template_download					
-  #  elif user_role_in_case == 'closed':							
-  #    child_support_draft_template_download						
-  #   set_progress(14)								
-  #  else:							
-  #    if interim_motion == 'wait':						
-  #      if general_information_about_forms:					
-  #        kids				
-  #      else:					
-  #        child_support_draft_template_download				
-  #    else:						
-  #      kids					
-  #      child_support_draft_template_download					
-  #   set_progress(28)								
+      if interim_motion == 'wait':						
+        if general_information_about_forms:					
+           kids
+        else:
+          child_support_draft_template_download
+      else:						
+        kids
+        child_support_draft_template_download				
+    elif user_role_in_case == 'closed':							
+      child_support_draft_template_download						
+  # set_progress(14)								
+    else:							
+      if interim_motion == 'wait':						
+        if general_information_about_forms:					
+          kids				
+        else:					
+          child_support_draft_template_download				
+      else:						
+        kids					
+        child_support_draft_template_download					
+  # set_progress(28)								
   elif existing_case == 'none':								
     paternity
-  #    if how_to_ask_for_child_support_from == 'cssd':
-  #      child_support_draft_template_download
+    if how_to_ask_for_child_support_from == 'cssd':
+      child_support_draft_template_download
   else:
     courtview
   Ask_CSSD_or_the_Court_for_a_child_support_order
