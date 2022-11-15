@@ -69,16 +69,17 @@ code: |
   # allowed_courts = interview_metadata["child_support_draft_template"]["allowed courts"]
   nav.set_section("review_child_support_draft_template")
   user_role = "na"
-  if existing_case == 'open':								
+  if existing_case == 'open':						
     if user_role_in_case == 'defendant':							
       need_to_respond
       if interim_motion == 'wait':						
         if general_information_about_forms:					
-           kids
+           number_of_children
+           child_support_draft_template_download
         else:
           child_support_draft_template_download
       else:						
-        kids
+        number_of_children
         child_support_draft_template_download				
     elif user_role_in_case == 'closed':							
       child_support_draft_template_download						
@@ -86,11 +87,11 @@ code: |
     else:							
       if interim_motion == 'wait':						
         if general_information_about_forms:					
-          kids				
+          number_of_children				
         else:					
           child_support_draft_template_download				
       else:						
-        kids					
+        number_of_children					
         child_support_draft_template_download					
   # set_progress(28)								
   elif existing_case == 'none':								
@@ -98,7 +99,36 @@ code: |
     if how_to_ask_for_child_support_from == 'cssd':
       child_support_draft_template_download
   else:
-    courtview
+    if after_courtview == 'open':						
+      if user_role_in_case == 'defendant':							
+        need_to_respond
+        if interim_motion == 'wait':						
+          if general_information_about_forms:					
+              number_of_children
+          else:
+            child_support_draft_template_download
+        else:						
+          number_of_children
+          child_support_draft_template_download				
+      elif user_role_in_case == 'closed':							
+        child_support_draft_template_download						
+    # set_progress(14)								
+      else:							
+        if interim_motion == 'wait':						
+          if general_information_about_forms:					
+            number_of_children				
+          else:					
+            child_support_draft_template_download				
+        else:						
+          number_of_children					
+          child_support_draft_template_download					
+    # set_progress(28)								
+    elif after_courtview == 'none':								
+      paternity
+      if how_to_ask_for_child_support_from == 'cssd':
+        child_support_draft_template_download
+    else:
+      child_support_draft_template_download
   Ask_CSSD_or_the_Court_for_a_child_support_order
   Ask_the_court_for_Child_Support
   set_progress(42)
@@ -190,8 +220,23 @@ subquestion: |
   Do you have an court case for: 
   •	custody, 
   •	divorce, or 
-  •	legal separation?
-continue button field: Look_for_your_name_in_Courtview
+  •	legal separation?Do you have a court case for custody, divorce, or legal separation?
+fields:
+  - no label: after_courtview
+    input type: radio
+    choices:
+      - Yes: open
+      - No: none
+      - "I still do not know": unknown
+  - What's going on?: user_role_in_case
+    input type: radio
+    choices:
+      - "Yes. The other parent started a case and I have to file papers to respond.": defendant
+      - "Yes. I filed papers to start the case and am waiting for the other side to respond.": plaintiff
+      - "Yes.  We have an open case.": joint
+      - "Yes, but the case ended and we got our final paperwork.": closed
+    js show if:
+      val('after_courtview') == 'open'
 ---
 id: Do you want information about how to fill out the papers you need to respond
 question: |
@@ -213,11 +258,11 @@ question: |
   Interim child support order
 subquestion: |
   % if existing_case == 'open':
-    % if user_role_in_case == 'defendant': 
-      % if need_to_respond:
-      Your Personal Action Plan now includes information about filing papers to respond in your ${ case_type } case. 
-      % endif
-    % endif
+  % if user_role_in_case == 'defendant': 
+  % if need_to_respond:
+   Your Personal Action Plan now includes information about filing papers to respond in your ${ case_type } case. 
+  % endif
+  % endif
   % endif
   
   The judge will enter a final child support order at the end of your case, and pick the date child support should start.  
@@ -227,20 +272,19 @@ subquestion: |
   Sometimes, when a case ends, one parent owes the other parent back child support.  
   
   If you do not want to wait until the end of your case, you can ask the judge for an “interim” Child Support order.    
-  fields:
-    - "What do you want to do?": interim_motion
-      input type: radio
-      choices:
-        - "Wait for the judge to order child support at the end of my case. Goto Gen information forms": wait
-        - "Ask the judge to order child support while my case is going on. TEM interim motions  affidavit  instructions_tf   order_instructions_tf  Go to kids": ask 
-    - note: |
-     
+fields:
+  - "What do you want to do?": interim_motion
+    input type: radio
+    choices:
+      - "Wait for the judge to order child support at the end of my case. Goto Gen information forms": wait
+      - "Ask the judge to order child support while my case is going on. TEM interim motions  affidavit  instructions_tf   order_instructions_tf  Go to kids": ask 
+  - note: |
       #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
       An interim order is any order the judge makes before they make the final order or decree. 
       The judge can make short-term decisions about child support, the parenting plan, 
-      % if existing_case == 'open': 
+      % if existing_case == 'open' and need_to_respond: 
         % if case_type in('divorce', 'dissolution', 'legal separation'):
-         possession of the family home, attorney fees, spousal support or payment of debts
+       possession of the family home, attorney fees, spousal support or payment of debts
         % endif
       % endif
       . 
@@ -269,9 +313,9 @@ fields:
       
       Child support is to support  children  who are under 18.
 
-      Child support orders usually last until your child turns 19 if: 
-
-      1.They still live with you or their other parent and
+      Child support orders usually last until your child turns 19 if:
+      
+      1. They still live with you or their other parent, and
       2. They are finishing high school.
 ---
 id: Paternity
@@ -288,20 +332,23 @@ subquestion: |
   * Proving someone is not the **biological** father is called disestablishing paternity. 
 
   Do you want to add information about establishing or disestablishing paternity to your Personal Action Plan?
-  yesno: paternity
-  - note: |
-      #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
-      Is the law different if my child":
-
-      *	is adopted, 
-      *	has parents who are the same gender,
-      *	has transgender parents, or
-      * was conceived by in vitro fertilization, or surrogacy?
-
-      A person who adopts a child is the child's legal parent.  
-      Usually, you cannot “undo” an adoption to “disestablish paternity”.  
-
-      These situations can be complicated.  If you have questions, it is a good idea to talk to a lawyer.
+field: paternity
+choices:
+  - Yes
+  - No
+under: |  
+  #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
+  Is the law different if my child:
+  
+  *	is adopted, 
+  *	has parents who are the same gender,
+  *	has transgender parents, or
+  * was conceived by in vitro fertilization, or surrogacy
+  A person who adopts a child is the child's legal parent.
+  
+  Usually, you cannot “undo” an adoption to “disestablish paternity”. 
+  These situations can be complicated.  If you have questions, it is a good idea to talk to a lawyer.
+  
 ---
 id: Ask CSSD or the Court for a child support order
 question: |
@@ -558,7 +605,7 @@ objects:
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[child_support_draft_template_Post_interview_instructions, child_support_draft_template_attachment], filename="child_support_draft_template", title="All forms to download for your records", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[child_support_draft_template_attachment], filename="child_support_draft_template", title="All forms to download for your records", enabled=True)
   - al_recipient_bundle: ALDocumentBundle.using(elements=[child_support_draft_template_attachment],  filename="child_support_draft_template", title="All forms to file", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
