@@ -1,6 +1,7 @@
 ---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
+  # - number_of_steps.yml
 ---
 metadata:
   title: |
@@ -96,7 +97,7 @@ code: |
   # set_progress(28)								
   elif existing_case == 'none':								
     paternity
-    if how_to_ask_for_child_support_from == 'cssd':
+    if ask_court_or_cssd == 'cssd':
       child_support_draft_template_download
   else:
     if after_courtview == 'open':						
@@ -125,22 +126,25 @@ code: |
     # set_progress(28)								
     elif after_courtview == 'none':								
       paternity
-      if how_to_ask_for_child_support_from == 'cssd':
+      if ask_court_or_cssd == 'cssd':
         child_support_draft_template_download
+    # set_progress(42)
+      else:
+        parents_married
+        if general_information_about_forms:
+          number_of_children
+          interim_motion
+          child_support_draft_template_download
+  #  set_progress(56)
+        else:
+          interim_motion
+          number_of_children
+          child_support_draft_template_download
     else:
       child_support_draft_template_download
-  Ask_CSSD_or_the_Court_for_a_child_support_order
-  Ask_the_court_for_Child_Support
-  set_progress(42)
-  Plus_general_CS
-  kids_2
-  Interim_child_support_order_2
-  set_progress(56)
-  Interim_child_support_order_3
-  kids_3
-  number_of_steps
-  set_progress(70)
-  modify
+  #  number_of_steps
+  #  set_progress(70)
+
   interview_order_child_support_draft_template = True
 ---
 ###################### Main order ######################
@@ -194,33 +198,20 @@ fields:
      #### <i class="fa-regular fa-lightbulb"></i> What if I need information about getting child support in another state? ####
      Your Personal Action Plan explains how child support works only in Alaska.  To find out about child support in other states find their [court](https://www.ncsc.org/information-and-resources/state-court-websites), [legal aid](https://lawhelp.org), [child support agency or tribal child support agency website](https://www.acf.hhs.gov/css/contact-information/state-and-tribal-child-support-agency-contacts).
 ---
-code: |
-  if existing_case == 'open': 
-    if user_role_in_case in ('defendant','plaintiff','joint'):
-      basics = True
-    else:
-      modify = True
----
-
-  #  - "Interim motion": interim_motion
-  #    datatype: yesno
   #  - "Interview title": interview_title
   #  - "Wrong path tf": wrong_path_tf
-  #    datatype: yesno
-  #  - "Do not know": do_not_know
   #    datatype: yesno
 ---
 id: Look for your name in Courtview
 question: |
   Look for your name in Courtview
 subquestion: |
-  Look for your name in Courtview, the Alaska Court System’s list of public court cases. If you find a case with your name you can see what kind of case it is.
-  https://records.courts.alaska.gov/eaccess/home.page.2 
+  Look for your name in [Courtview](https://records.courts.alaska.gov/eaccess/search.page.3), the Alaska Court System’s list of public court cases. If you find a case with your name you can see what kind of case it is.  
+  Do you have a court case for: 
   
-  Do you have an court case for: 
-  •	custody, 
-  •	divorce, or 
-  •	legal separation?Do you have a court case for custody, divorce, or legal separation?
+  *	custody, 
+  *	divorce, or 
+  *	legal separation?
 fields:
   - no label: after_courtview
     input type: radio
@@ -294,7 +285,11 @@ id: info about filling out child support forms
 question: |
   Filling out the court's child support forms
 subquestion: |
+  % if (existing_case == 'open' and user_role_in_case != 'closed') or (existing_case == 'unknown' and after_courtview == 'open' and user_role_in_case != 'closed'):
   Do you want your Personal Action Plan to include directions for filling out the court's child support forms?
+  % else:
+  Do you want your Personal Action Plan to include information to help you fill out the child support forms when you start your case? 
+  % endif
 yesno: general_information_about_forms
 ---
 id: kids
@@ -332,22 +327,22 @@ subquestion: |
   * Proving someone is not the **biological** father is called disestablishing paternity. 
 
   Do you want to add information about establishing or disestablishing paternity to your Personal Action Plan?
-field: paternity
-choices:
-  - Yes
-  - No
-under: |  
-  #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
-  Is the law different if my child:
-  
-  *	is adopted, 
-  *	has parents who are the same gender,
-  *	has transgender parents, or
-  * was conceived by in vitro fertilization, or surrogacy
-  A person who adopts a child is the child's legal parent.
-  
-  Usually, you cannot “undo” an adoption to “disestablish paternity”. 
-  These situations can be complicated.  If you have questions, it is a good idea to talk to a lawyer.
+fields:
+  - no label: paternity
+    datatype: yesnoradio
+  - note: |
+      #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
+      Is the law different if my child:
+      
+      *	is adopted, 
+      *	has parents who are the same gender,
+      *	has transgender parents, or
+      * was conceived by in vitro fertilization, or surrogacy?
+      
+      A person who adopts a child is the child's legal parent.
+      Usually, you cannot “undo” an adoption to “disestablish paternity”.
+      
+      These situations can be complicated.  If you have questions, it is a good idea to talk to a lawyer.
   
 ---
 id: Ask CSSD or the Court for a child support order
@@ -355,35 +350,36 @@ question: |
   Ask CSSD or the Court for a child support order
 subquestion: |
   A child support order tells one parent to pay child support to the other parent. 
-  The Alaska court orders child support as part of a Parenting Plans in divorce, custody, dissolution or legal separation cases.  Parenting Plans are sometimes called “custody orders”.  
+  The Alaska court orders child support as part of a Parenting Plan in divorce, custody, dissolution or legal separation cases.  Parenting Plans are sometimes called “custody orders”.  
   A Parenting Plan is a list of decisions about:
-  o	which parent will pay child support, 
-  o	the amount of child support
-  o	a schedule for when and how long your children will stay at each parent’s house, 
-  o	a holiday schedule,
-  o	how you will make decisions about your children, and 
-  o	financial questions like, 
-  	“How to spend our children’s PFDs?”  or 
-  	“Which parent should claim any child tax credits?”.  
+  
+  *	which parent pays child support, 
+  *	the amount of child support
+  *	a schedule for when and how long your children will stay at each parent’s house, 
+  *	a holiday schedule,
+  *	how you will make decisions about your children, and 
+  *	financial questions like: 
+    *	“How to spend our children’s PFDs?” or 
+    *	“Which parent should claim any child tax credits?”  
   
   The Alaska Child Support Services Division (CSSD) can order child support but does not order Parenting Plans. CSSD child support orders work best if you do not need a Parenting Plan.  
-  What do you want to add to your Personal Action Plan?  
-  I want to learn how to ask for child support from: how_to_ask_for_child_support_from
-  •	Alaska Court – [] Go to Ask the Court for Child Support
-  •	CSSD – [CSSD TF] – [End Screen PDF]  
-  •	Both - [CSSDTF] – Go to Ask the Court for Child Support
-  
-  Learn more
-  Prompt:How does the court or CSSD decide how much Child Support to order?
-  Text:, the Alaska Supreme Court sets the guidelines that judges and Alaska Child Support Services must follow when they decide the amount of child support payments. You can read the rule and the Child Support Guideline Committee’s comments about the rule online See :
-  Child Support Awards In Civil Rule 90.3
-continue button field: Ask_CSSD_or_the_Court_for_a_child_support_order
+  What do you want to add to your Personal Action Plan?
+fields: 
+  - "I want to learn how to ask for child support from": ask_court_or_cssd
+    input type: radio
+    choices:
+  	  - "Alaska Court – [] Go to Ask the Court for Child Support": court
+      - "CSSD – [CSSD TF] – [End Screen PDF]": cssd
+      - "Both - [CSSDTF] – Go to Ask the Court for Child Support": both
+  - note: |
+      #### <i class="fa-regular fa-lightbulb"></i> How does the court or CSSD decide how much Child Support to order?####
+      The Alaska Supreme Court sets the guidelines that judges and Alaska Child Support Services must follow when they decide the amount of child support payments. You can read the rule and the Child Support Guideline Committee’s comments about the rule online See [Child Support Awards in Civil Rule 90.3](https://casetext.com/rule/alaska-court-rules/alaska-rules-of-civil-procedure/part-xii-special-proceedings/rule-903-child-support-awards) or [the court's PDF](https://public.courts.alaska.gov/web/rules/docs/civ.pdf)
 ---
 id: Ask the court for Child Support
 question: |
   Ask the court for Child Support
 subquestion: |
-  # % if I how_to_ask_for_child_support_from (page 8) == ‘Both’:
+  # % if I ask_court_or_cssd (page 8) == ‘Both’:
   Your Personal Action Plan includes information about how to ask the Alaska Child Support Services Division (CSSD) for a child support order. % endif
   
   If you want the court to order child support, you must start a court case.
@@ -391,12 +387,9 @@ subquestion: |
   If you are not married to the other parent, start a custody case to get a Parenting Plan and child support.
   
   If you are married to the other parent, start a divorce, dissolution, or legal separation case.
-  
-  Are you married to your children’s other parent? parents married
-  
-  Yes [Start Div- send to starting end marriage GA] Go to Plus General CS
-  No  [Start custody – send to starting custody GA]  Go to Plus General CS
-continue button field: Ask_the_court_for_Child_Support
+fields: 
+  - "Are you married to your children’s other parent?": parents_married
+    datatype: yesnoradio
 ---
 id: Plus general CS
 question: |
@@ -407,87 +400,8 @@ subquestion: |
   No – Go To Interim child support order 3
   
   [Note – Kids 2 is so the user can get general information about forms for starting the case and then tell how many kids and then can be asked if they want interim child support information – if they say yes to both, only need to add about interim motions – do not need to ask how many kids again or give other documents again.  But if they say no, it then asks about interim child support.  I have hopeful you can do it all with logic so each question is only asked once!  I put them multiple times here to be sure you understood the logic.  I am hopeful this is done and we don’t have to discuss language or logic, but if it is not done, please leave in the duplicates until we get it finalized]
-continue button field: Plus_general_CS
----
-id: kids 2
-question: |
-  kids 2
-subquestion: |
-  How many children will your child support order to cover? 
-    
-  •	One [1 child TF Go To Interim Child support order 2
-  •	More than one [more child TF] Go To Interim Child support order 2
-  Learn more
-   Child support is to support  children  who are under 18.  
-  Child support orders are usually last until your child turns 19 if: 
-  3.	They still live with you or their other parent and
-  4.	They are finishing high school.
-continue button field: kids_2
----
-id: Interim child support order 2
-question: |
-  Interim child support order 2
-subquestion: |
-  The judge will order child support at the end of your case.  
-  
-  The order tells you the date your child support should have started.  It may be the date your case started, or it may be  earlier.  Child support generally starts when parents do not live together. 
-  
-  If you want to ask for child support while your case is going on, you can ask the judge for an “interim” Child Support order.  
-  
-  What do you want to do?
-  	Wait for the judge to order child support at the end of my case. PDF 
-  	Ask the judge to order child support while my case is going on. – [TEM interim motions– PDF
-  Learn more
-  Prompt:
-  Text: An interim order is any order the judge makes before they make the final order or decree. 
-  The judge can make short-term decisions about child support, the parenting plan, 
-  # % if exisitng_case == ‘yes’: 
-  #      % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
-  #      % endif
-  # % endif. 
-  The final order may be entirely different.
-continue button field: Interim_child_support_order_2
----
-id: Interim child support order 3
-question: |
-  Interim child support order 3
-subquestion: |
-  The judge will order child support at the end of your case.  
-  
-  The order tells you the date your child support should have started.  It may be the date your case started, or it may be  earlier.  Child support generally starts when parents do not live together. 
-  
-  If you want to ask for child support while your case is going on, you can ask the judge for an “interim” Child Support order.  
-  
-  What do you want to do?
-  	Wait for the judge to order child support at the end of my case. PDF
-  	Ask the judge to order child support while my case is going on. – [TEM interim motions [Affidavit TF] [Order TF]   – Go to kids 3
-  Learn more
-  Prompt:
-  Text: An interim order is any order the judge makes before they make the final order or decree. 
-  The judge can make short-term decisions about child support, the parenting plan, 
-  # % if exisitng_case == ‘yes’: 
-  #      % if case_type == divorce, dissolution, legal sep or custody ‘ possession of the family home, attorney fees, spousal support or payment of debts
-  #      % endif
-  # % endif. 
-  The final order may be entirely different.
-continue button field: Interim_child_support_order_3
----
-id: kids 3
-question: |
-  kids 3
-subquestion: |
-  Text: 
-  How many children will your child support order to cover? 
-    
-  •	One [1 child TF PDF
-  •	More than one [more child TF] PDF
-  
-  Learn more
-   Child support is to support  children  who are under 18.  
-  Child support orders are usually last until your child turns 19 if: 
-  5.	They still live with you or their other parent and
-  6.	They are finishing high school.
-continue button field: kids_3
+field: plus_general_cs
+datatype: yesnoradio
 ---
 id: Screen 15
 question: |
@@ -620,6 +534,6 @@ attachments:
     filename: child_support_draft_template
     variable name: child_support_draft_template_attachment[i]
     skip undefined: True
-    docx template file: child_support_draft_template.docx
+    docx template file: child_support_draft_template_breaking_up_parts_2022-11-15.docx
 
 
