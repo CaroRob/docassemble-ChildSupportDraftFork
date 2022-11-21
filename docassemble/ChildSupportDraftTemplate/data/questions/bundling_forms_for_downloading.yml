@@ -1,7 +1,4 @@
 ---
-include:
-  - docassemble.AssemblyLine:assembly_line.yml
----
 objects:
   - bundle_test: ALDocumentBundle.using( elements=[pdf_from_url1, pdf_from_url2], title="Test Bundle", filename="test_bundle" )
 ---
