@@ -1,0 +1,44 @@
+---
+objects:
+  - my_pdf: DAFile
+  - my_pdf2: DAFile
+---
+mandatory: True
+code: |  
+  url = 'https://courts.alaska.gov/shc/family/docs/shc-1100n.pdf'
+  (filename, mimetype) = path_and_mimetype(url)
+  my_pdf.set_mimetype(mimetype)
+  my_pdf.copy_into(filename)
+  my_pdf.initialized = True
+  
+  url = 'https://public.courts.alaska.gov/web/forms/docs/dr-305.pdf'
+  (filename, mimetype) = path_and_mimetype(url)
+  my_pdf2.set_mimetype(mimetype)
+  my_pdf2.copy_into(filename)
+  my_pdf2.initialized = True
+  
+  toinclude = []
+  if "interim" in which_forms.true_values():
+    toinclude.append(my_pdf)
+  if "affidavit" in which_forms.true_values():
+    toinclude.append(my_pdf2)  
+  end
+---
+event: end
+question: |
+  Here are the files
+subquestion: |
+  
+  ${pdf_concatenate(toinclude)}
+---
+comment: |
+  For bundling see 209A conditional bundling: https://github.com/SuffolkLITLab/docassemble-MA209AProtectiveOrder/blob/master/docassemble/MA209AProtectiveOrder/data/questions/209a_package.yml ll. 581-end
+question: |
+  Which form do you need?
+fields: 
+  - form choices: which_forms
+    datatype: checkboxes
+    choices:
+      - interim
+      - affidavit
+---
