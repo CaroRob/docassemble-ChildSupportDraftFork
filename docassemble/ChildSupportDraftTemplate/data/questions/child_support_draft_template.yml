@@ -99,6 +99,18 @@ code: |
     paternity
     if ask_court_or_cssd == 'cssd':
       child_support_draft_template_download
+    else:
+      parents_married
+      if general_information_about_forms:
+        number_of_children
+        interim_motion
+        child_support_draft_template_download
+      else:
+        if interim_motion == 'wait':
+          child_support_draft_template_download
+        else:
+          number_of_children
+          child_support_draft_template_download
   else:
     if after_courtview == 'open':						
       if user_role_in_case == 'defendant':							
@@ -500,7 +512,6 @@ question: |
 subquestion: |
   You can see, download (and eventually send) your plan.
    ${ al_user_bundle.download_list_html() }
-
 buttons:
   - Start over: restart  
 progress: 100
@@ -533,6 +544,8 @@ attachments:
     filename: child_support_draft_template
     variable name: child_support_draft_template_attachment[i]
     skip undefined: True
-    docx template file: child_support_draft_template_breaking_up_parts_2022-11-15.docx
+    docx template file: child_support_draft_template.docx
+
+  # docx template file: child_support_draft_template_2022-11-20_using-seq-for-steps2.docx
 
 
