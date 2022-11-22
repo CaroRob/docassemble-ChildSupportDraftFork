@@ -1,7 +1,7 @@
 ---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
-  # - number_of_steps.yml
+  - bundling_forms_for_downloading.yml
 ---
 metadata:
   title: |
