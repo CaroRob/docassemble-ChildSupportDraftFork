@@ -8,7 +8,6 @@ objects:
   - pdf_from_url2: ALDocument.using( title="One", filename="one.pdf" )
   - pdf_from_url2['final']: DAFile
 ---
-mandatory: True
 #depends on:
 #  - my_intermin_var
 #  - my_affidavit_var
