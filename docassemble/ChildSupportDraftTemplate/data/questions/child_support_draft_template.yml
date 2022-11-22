@@ -247,7 +247,7 @@ question: |
 fields:
   - no label: need_to_respond
     datatype: yesnoradio
-  - "what kind of case?": case_type 
+  - "What kind of case?": case_type 
     input type: radio
     choices:
       - "Divorce": divorce
@@ -285,7 +285,7 @@ fields:
       #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
       An interim order is any order the judge makes before they make the final order or decree. 
       The judge can make short-term decisions about child support, the parenting plan, 
-      % if existing_case == 'open' and need_to_respond: 
+      % if existing_case == 'open' and user_role_in_case == 'defendant' and need_to_respond: 
         % if case_type in('divorce', 'dissolution', 'legal separation'):
        possession of the family home, attorney fees, spousal support or payment of debts
         % endif
@@ -331,12 +331,12 @@ question: |
 subquestion: |
   You and your child's other legal parent are responsible for financially supporting your child.  
   
-  A childs biological father is generally their legal father.
+  A child's biological father is generally their legal father.
 
   If parents disagree, either parent can ask the court to decide.  
  
-  * Proving someone is the **biological** father of a child is called establishing paternity.
-  * Proving someone is not the **biological** father is called disestablishing paternity. 
+  * Proving someone is the **biological** father of a child is called "establishing paternity."
+  * Proving someone is not the **biological** father is called "disestablishing paternity." 
 
   Do you want to add information about establishing or disestablishing paternity to your Personal Action Plan?
 fields:
@@ -377,12 +377,13 @@ subquestion: |
   The Alaska Child Support Services Division (CSSD) can order child support but does not order Parenting Plans. CSSD child support orders work best if you do not need a Parenting Plan.  
   What do you want to add to your Personal Action Plan?
 fields: 
-  - "I want to learn how to ask for child support from": ask_court_or_cssd
+  - "I want to learn how to ask for child support from:": ask_court_or_cssd
+    # label above field: True
     input type: radio
     choices:
-  	  - "Alaska Court – [] Go to Ask the Court for Child Support": court
-      - "CSSD – [CSSD TF] – [End Screen PDF]": cssd
-      - "Both - [CSSDTF] – Go to Ask the Court for Child Support": both
+  	  - "Alaska Court": court
+      - "CSSD": cssd
+      - "Both": both
   - note: |
       #### <i class="fa-regular fa-lightbulb"></i> How does the court or CSSD decide how much Child Support to order?####
       The Alaska Supreme Court sets the guidelines that judges and Alaska Child Support Services must follow when they decide the amount of child support payments. You can read the rule and the Child Support Guideline Committee’s comments about the rule online See [Child Support Awards in Civil Rule 90.3](https://casetext.com/rule/alaska-court-rules/alaska-rules-of-civil-procedure/part-xii-special-proceedings/rule-903-child-support-awards) or [the court's PDF](https://public.courts.alaska.gov/web/rules/docs/civ.pdf)
@@ -391,8 +392,9 @@ id: Ask the court for Child Support
 question: |
   Ask the court for Child Support
 subquestion: |
-  # % if I ask_court_or_cssd (page 8) == ‘Both’:
-  Your Personal Action Plan includes information about how to ask the Alaska Child Support Services Division (CSSD) for a child support order. % endif
+  % if ask_court_or_cssd == 'both':
+  Your Personal Action Plan includes information about how to ask the Alaska Child Support Services Division (CSSD) for a child support order. 
+  % endif
   
   If you want the court to order child support, you must start a court case.
   
@@ -545,7 +547,4 @@ attachments:
     variable name: child_support_draft_template_attachment[i]
     skip undefined: True
     docx template file: child_support_draft_template.docx
-
-  # docx template file: child_support_draft_template_2022-11-20_using-seq-for-steps2.docx
-
 
