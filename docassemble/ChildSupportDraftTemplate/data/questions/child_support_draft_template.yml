@@ -546,5 +546,11 @@ attachments:
     filename: child_support_draft_template
     variable name: child_support_draft_template_attachment[i]
     skip undefined: True
-    docx template file: child_support_draft_template.docx
-
+    docx template file: child_support_draft_template_image_test-case-not-path-10-44am.docx
+    # child_support_draft_template_image_test-case-not-path-10-34am.docx
+    # child_support_draft_template_image_test-case-not-path.docx (heading only not ref - worked. wrong variable dodo brain!)
+    # 2022-11-23 last to work: child_support_draft_template_image_test.docx
+    # child_support_draft_template_image_test.docx (works 11/23 8:56am)
+    # child_support_draft_template_if_else_title.docx (works 11/23 8:53am)
+    # child_support_draft_template_2022-11-22_12-11-am.docx (works 11/23 8:50am)
+    # docx template file: child_support_draft_template.docx
