@@ -279,8 +279,8 @@ fields:
   - "What do you want to do?": interim_motion
     input type: radio
     choices:
-      - "Wait for the judge to order child support at the end of my case. Goto Gen information forms": wait
-      - "Ask the judge to order child support while my case is going on. TEM interim motions  affidavit  instructions_tf   order_instructions_tf  Go to kids": ask 
+      - "Wait for the judge to order child support at the end of my case.": wait
+      - "Ask the judge to order child support while my case is going on": ask 
   - note: |
       #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
       An interim order is any order the judge makes before they make the final order or decree. 
@@ -546,11 +546,4 @@ attachments:
     filename: child_support_draft_template
     variable name: child_support_draft_template_attachment[i]
     skip undefined: True
-    docx template file: child_support_draft_template_image_test-case-not-path-10-44am.docx
-    # child_support_draft_template_image_test-case-not-path-10-34am.docx
-    # child_support_draft_template_image_test-case-not-path.docx (heading only not ref - worked. wrong variable dodo brain!)
-    # 2022-11-23 last to work: child_support_draft_template_image_test.docx
-    # child_support_draft_template_image_test.docx (works 11/23 8:56am)
-    # child_support_draft_template_if_else_title.docx (works 11/23 8:53am)
-    # child_support_draft_template_2022-11-22_12-11-am.docx (works 11/23 8:50am)
-    # docx template file: child_support_draft_template.docx
+    docx template file: child_support_draft_template.docx
