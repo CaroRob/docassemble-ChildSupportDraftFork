@@ -1,7 +1,7 @@
 ---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
-  - bundling_forms_for_downloading.yml
+  - bundling_forms_for_downloading2.yml
 ---
 metadata:
   title: |
@@ -76,11 +76,13 @@ code: |
       if interim_motion == 'wait':						
         if general_information_about_forms:					
            number_of_children
+           get_forms
            child_support_draft_template_download
         else:
           child_support_draft_template_download
       else:						
         number_of_children
+        get_forms
         child_support_draft_template_download				
     elif user_role_in_case == 'closed':							
       child_support_draft_template_download						
@@ -88,11 +90,14 @@ code: |
     else:							
       if interim_motion == 'wait':						
         if general_information_about_forms:					
-          number_of_children				
+          number_of_children
+          get_forms
+          child_support_draft_template_download	
         else:					
           child_support_draft_template_download				
       else:						
-        number_of_children					
+        number_of_children
+        get_forms
         child_support_draft_template_download					
   # set_progress(28)								
   elif existing_case == 'none':								
@@ -103,13 +108,15 @@ code: |
       parents_married
       if general_information_about_forms:
         number_of_children
-        interim_motion
+        interim_motion        
+        get_forms
         child_support_draft_template_download
       else:
         if interim_motion == 'wait':
           child_support_draft_template_download
         else:
           number_of_children
+          get_forms
           child_support_draft_template_download
   else:
     if after_courtview == 'open':						
@@ -118,10 +125,13 @@ code: |
         if interim_motion == 'wait':						
           if general_information_about_forms:					
               number_of_children
+              get_forms
+              child_support_draft_template_download
           else:
             child_support_draft_template_download
         else:						
           number_of_children
+          get_forms
           child_support_draft_template_download				
       elif user_role_in_case == 'closed':							
         child_support_draft_template_download						
@@ -129,11 +139,14 @@ code: |
       else:							
         if interim_motion == 'wait':						
           if general_information_about_forms:					
-            number_of_children				
+            number_of_children
+            get_forms
+            child_support_draft_template_download
           else:					
             child_support_draft_template_download				
         else:						
-          number_of_children					
+          number_of_children
+          get_forms
           child_support_draft_template_download					
     # set_progress(28)								
     elif after_courtview == 'none':								
@@ -146,17 +159,19 @@ code: |
         if general_information_about_forms:
           number_of_children
           interim_motion
+          get_forms
           child_support_draft_template_download
   #  set_progress(56)
         else:
           interim_motion
           number_of_children
+          get_forms
           child_support_draft_template_download
     else:
       child_support_draft_template_download
   #  number_of_steps
   #  set_progress(70)
-
+  
   interview_order_child_support_draft_template = True
 ---
 ###################### Main order ######################
@@ -511,7 +526,21 @@ question: |
   Your Personal Action Plan is ready!
 subquestion: |
   You can see, download (and eventually send) your plan.
-   ${ al_user_bundle.download_list_html() }
+  
+  **Your plan:** 
+  
+  ${ al_user_bundle.download_list_html() }
+  
+  ** Your forms individually + a zip: **
+  
+  ${ forms_bundle.download_list_html(key="final") }
+  
+  **  If you want to download only the zip. ** 
+  
+  ${ forms_bundle.as_zip(key="final", title = "All your forms in a zip which you can extract all the  files you need") }
+  
+   
+   
 buttons:
   - Start over: restart  
 progress: 100
@@ -545,7 +574,4 @@ attachments:
     variable name: child_support_draft_template_attachment[i]
     skip undefined: True
     docx template file: child_support_draft_template.docx
-
-  # docx template file: child_support_draft_template_2022-11-20_using-seq-for-steps2.docx
-
 

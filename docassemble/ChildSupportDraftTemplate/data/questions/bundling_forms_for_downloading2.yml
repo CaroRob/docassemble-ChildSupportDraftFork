@@ -1,0 +1,122 @@
+---
+objects:
+  - forms_bundle: ALDocumentBundle.using( elements=[pdf_from_motion_url, pdf_from_interim_order_url,pdf_from_affidavit_url, pdf_from_affidavit_howto_url, pdf_from_order_url, pdf_from_shared_custody_url, pdf_from_divided_custody_url, pdf_from_hybrid_custody_url], title="Forms for your case", filename="forms_for_your_case" )
+---
+objects:
+  - pdf_from_motion_url: ALDocument.using( title="Motion and Affidavit for Interim Custody & Support", filename="shc-1100n.pdf" )
+  - pdf_from_motion_url['final']: DAFile
+  
+  - pdf_from_interim_order_url: ALDocument.using( title="Order on Interim Orders - With Children", filename="shc-1102n.pdf" )
+  - pdf_from_interim_order_url['final']: DAFile
+
+  - pdf_from_affidavit_url: ALDocument.using( title="DR-305 Child Support Guidelines Affidavit CR 90.3", filename="dr-305.pdf" )
+  - pdf_from_affidavit_url['final']: DAFile
+
+  - pdf_from_affidavit_howto_url: ALDocument.using( title="How to Fill out the Child Support Guidelines Affidavit", filename="shc-dr305f-sample.pdf" )
+  - pdf_from_affidavit_howto_url['final']: DAFile
+
+  - pdf_from_order_url: ALDocument.using( title="Order on Child Support, DR-300", filename="dr-300.pdf " )
+  - pdf_from_order_url['final']: DAFile
+
+  - pdf_from_shared_custody_url: ALDocument.using( title="Shared Custody Support Calculation, DR-306", filename="dr-306.pdf" )
+  - pdf_from_shared_custody_url['final']: DAFile
+
+  - pdf_from_divided_custody_url: ALDocument.using( title="Divided Custody Support Calculation, DR-307", filename="dr-307.pdf" )
+  - pdf_from_divided_custody_url['final']: DAFile
+
+  - pdf_from_hybrid_custody_url: ALDocument.using( title="Hybrid Custody Child Support Calculation, DR-308", filename="dr-308.pdf" )
+  - pdf_from_hybrid_custody_url['final']: DAFile
+---
+code: |
+  if interim_motion:
+    motion_url = 'https://courts.alaska.gov/shc/family/docs/shc-1100n.pdf'
+    (filename, mimetype) = path_and_mimetype(motion_url)
+    pdf_from_motion_url['final'].set_mimetype(mimetype)
+    pdf_from_motion_url['final'].copy_into(filename)
+    pdf_from_motion_url['final'].initialized = True
+    pdf_from_motion_url.enabled = True
+    
+    interim_order = 'https://courts.alaska.gov/shc/family/docs/shc-1102n.pdf'
+    (filename, mimetype) = path_and_mimetype(interim_order)
+    pdf_from_interim_order_url['final'].set_mimetype(mimetype)
+    pdf_from_interim_order_url['final'].copy_into(filename)
+    pdf_from_interim_order_url['final'].initialized = True
+    pdf_from_interim_order_url.enabled = True
+  else:
+    pdf_from_motion_url.enabled = False
+    pdf_from_interim_order_url.enabled = False
+    
+  if general_information_about_forms:
+    affidavit_url = 'https://public.courts.alaska.gov/web/forms/docs/dr-305.pdf'
+    (filename, mimetype) = path_and_mimetype(affidavit_url)
+    pdf_from_affidavit_url['final'].set_mimetype(mimetype)
+    pdf_from_affidavit_url['final'].copy_into(filename)
+    pdf_from_affidavit_url['final'].initialized = True
+    pdf_from_affidavit_url.enabled = True
+
+    affidavit_howto_url ='https://courts.alaska.gov/shc/family/docs/shc-dr305f-sample.pdf'
+    (filename, mimetype) = path_and_mimetype(affidavit_howto_url)
+    pdf_from_affidavit_howto_url['final'].set_mimetype(mimetype)
+    pdf_from_affidavit_howto_url['final'].copy_into(filename)
+    pdf_from_affidavit_howto_url['final'].initialized = True
+    pdf_from_affidavit_howto_url.enabled = True
+  
+    order_url = 'https://public.courts.alaska.gov/web/forms/docs/dr-300.pdf'
+    (filename, mimetype) = path_and_mimetype(order_url)
+    pdf_from_order_url['final'].set_mimetype(mimetype)
+    pdf_from_order_url['final'].copy_into(filename)
+    pdf_from_order_url['final'].initialized = True
+    pdf_from_order_url.enabled = True
+  else:
+    pdf_from_affidavit_url.enabled = False
+    pdf_from_affidavit_howto_url.enabled = False
+    pdf_from_order_url.enabled = False
+
+  if number_of_children in('one', 'more than one'):
+    shared_custody_url = 'https://public.courts.alaska.gov/web/forms/docs/dr-306.pdf'
+    (filename, mimetype) = path_and_mimetype(shared_custody_url)
+    pdf_from_shared_custody_url['final'].set_mimetype(mimetype)
+    pdf_from_shared_custody_url['final'].copy_into(filename)
+    pdf_from_shared_custody_url['final'].initialized = True
+    pdf_from_shared_custody_url.enabled = True
+  else:
+    pdf_from_shared_custody_url.enabled = False
+
+  if number_of_children == 'more than one':    
+    divided_custody_url = 'https://public.courts.alaska.gov/web/forms/docs/dr-307.pdf'
+    (filename, mimetype) = path_and_mimetype(divided_custody_url)
+    pdf_from_divided_custody_url['final'].set_mimetype(mimetype)
+    pdf_from_divided_custody_url['final'].copy_into(filename)
+    pdf_from_divided_custody_url['final'].initialized = True
+    pdf_from_divided_custody_url.enabled = True
+    
+    hybrid_custody_url = 'https://public.courts.alaska.gov/web/forms/docs/dr-308.pdf'
+    (filename, mimetype) = path_and_mimetype(hybrid_custody_url)
+    pdf_from_hybrid_custody_url['final'].set_mimetype(mimetype)
+    pdf_from_hybrid_custody_url['final'].copy_into(filename)
+    pdf_from_hybrid_custody_url['final'].initialized = True
+    pdf_from_hybrid_custody_url.enabled = True
+  else:
+    pdf_from_divided_custody_url.enabled = False
+    pdf_from_hybrid_custody_url.enabled = False
+    
+  get_forms = True
+---
+event: end_interview
+question: |
+  Here are the files
+subquestion: |
+  
+  ${ forms_bundle.as_pdf(key="final") }
+---
+comment: |
+  For bundling see 209A conditional bundling: https://github.com/SuffolkLITLab/docassemble-MA209AProtectiveOrder/blob/master/docassemble/MA209AProtectiveOrder/data/questions/209a_package.yml ll. 581-end
+question: |
+  Which form do you need?
+fields: 
+  - form choices: which_forms
+    datatype: checkboxes
+    choices:
+      - interim
+      - affidavit
+---

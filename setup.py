@@ -44,7 +44,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.ChildSupportDraftTemplate',
-      version='1.0',
+      version='1.02',
       description=('Asking for Child Support'),
       long_description='# docassemble.ChildSupportDraftTemplate\r\n\r\nAsking for Child Support\r\n\r\n## Author\r\n\r\nCaroline Robinson\r\n\r\n',
       long_description_content_type='text/markdown',
@@ -54,7 +54,7 @@ setup(name='docassemble.ChildSupportDraftTemplate',
       url='https://courtformsonline.org',
       packages=find_packages(),
       namespace_packages=['docassemble'],
-      install_requires=['docassemble.AssemblyLine>=2.15.0'],
+      install_requires=['docassemble.AssemblyLine>=2.19.0'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/ChildSupportDraftTemplate/', package='docassemble.ChildSupportDraftTemplate'),
      )

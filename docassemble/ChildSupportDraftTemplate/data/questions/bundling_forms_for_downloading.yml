@@ -1,19 +1,20 @@
 ---
 objects:
-  - bundle_test: ALDocumentBundle.using( elements=[pdf_from_url1, pdf_from_url2], title="Test Bundle", filename="test_bundle" )
+  - forms_bundle: ALDocumentBundle.using( elements=[pdf_from_url1, pdf_from_url2], title="Forms for your case", filename="forms_for_your_case" )
 ---
 objects:
-  - pdf_from_url1: ALDocument.using( title="One", filename="one.pdf" )
+  - pdf_from_url1: ALDocument.using( title="Affidavit for Interim Orders", filename="MOTION and AFFIDAVIT FOR INTERIM ORDERS (minor children).pdf" )
   - pdf_from_url1['final']: DAFile
-  - pdf_from_url2: ALDocument.using( title="One", filename="one.pdf" )
+  - pdf_from_url2: ALDocument.using( title="DR-305 Child Support Guidelines Affidavit CR 90.3", filename="DR-305 Child Support Guidelines Affidavit CR 90.3.pdf" )
   - pdf_from_url2['final']: DAFile
 ---
-mandatory: True
+# mandatory: True
 #depends on:
 #  - my_intermin_var
 #  - my_affidavit_var
+
 code: |
-  if "interim" in which_forms.true_values():
+  if interim_motion:
     url_1 = 'https://courts.alaska.gov/shc/family/docs/shc-1100n.pdf'
     (filename, mimetype) = path_and_mimetype(url_1)
     pdf_from_url1['final'].set_mimetype(mimetype)
@@ -23,7 +24,7 @@ code: |
   else:
     pdf_from_url1.enabled = False
     
-  if "affidavit" in which_forms.true_values():
+  if 
     url_2 = 'https://public.courts.alaska.gov/web/forms/docs/dr-305.pdf'
     (filename, mimetype) = path_and_mimetype(url_2)
     pdf_from_url2['final'].set_mimetype(mimetype)
@@ -33,14 +34,14 @@ code: |
   else:
     pdf_from_url2.enabled = False
     
-  end_interview
+  get_forms = True
 ---
 event: end_interview
 question: |
   Here are the files
 subquestion: |
   
-  ${ bundle_test.as_pdf(key="final") }
+  ${ forms_bundle.as_pdf(key="final") }
 ---
 comment: |
   For bundling see 209A conditional bundling: https://github.com/SuffolkLITLab/docassemble-MA209AProtectiveOrder/blob/master/docassemble/MA209AProtectiveOrder/data/questions/209a_package.yml ll. 581-end
