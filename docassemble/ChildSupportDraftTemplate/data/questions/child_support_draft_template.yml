@@ -71,54 +71,16 @@ code: |
   # allowed_courts = interview_metadata["child_support_draft_template"]["allowed courts"]
   nav.set_section("review_child_support_draft_template")
   user_role = "na"
-  if existing_case == 'open':						
-    if user_role_in_case == 'defendant':							
-      need_to_respond
-      if interim_motion == 'wait':						
-        if general_information_about_forms:					
-           number_of_children
-           child_support_draft_template_download
-        else:
-          child_support_draft_template_download
-      else:						
-        number_of_children
-        child_support_draft_template_download				
-    elif user_role_in_case == 'closed':							
-      child_support_draft_template_download						
-  # set_progress(14)								
-    else:							
-      if interim_motion == 'wait':						
-        if general_information_about_forms:					
-          number_of_children				
-        else:					
-          child_support_draft_template_download				
-      else:						
-        number_of_children					
-        child_support_draft_template_download					
-  # set_progress(28)								
-  elif existing_case == 'none':								
-    paternity
-    if ask_court_or_cssd == 'cssd':
-      child_support_draft_template_download
-    else:
-      parents_married
-      if general_information_about_forms:
-        number_of_children
-        interim_motion
-        child_support_draft_template_download
-      else:
-        if interim_motion == 'wait':
-          child_support_draft_template_download
-        else:
-          number_of_children
-          child_support_draft_template_download
+  if not wants_action_plan:
+    child_support_draft_template_download
   else:
-    if after_courtview == 'open':						
+    if existing_case == 'open':						
       if user_role_in_case == 'defendant':							
         need_to_respond
         if interim_motion == 'wait':						
           if general_information_about_forms:					
-              number_of_children
+             number_of_children
+             child_support_draft_template_download
           else:
             child_support_draft_template_download
         else:						
@@ -128,7 +90,7 @@ code: |
         child_support_draft_template_download						
     # set_progress(14)								
       else:							
-        if interim_motion == 'wait':						
+        if interim_motion == 'wait':	
           if general_information_about_forms:					
             number_of_children				
           else:					
@@ -137,26 +99,67 @@ code: |
           number_of_children					
           child_support_draft_template_download					
     # set_progress(28)								
-    elif after_courtview == 'none':								
+    elif existing_case == 'none':								
       paternity
       if ask_court_or_cssd == 'cssd':
         child_support_draft_template_download
-    # set_progress(42)
       else:
         parents_married
         if general_information_about_forms:
           number_of_children
           interim_motion
           child_support_draft_template_download
-  #  set_progress(56)
         else:
-          interim_motion
-          number_of_children
-          child_support_draft_template_download
+          if interim_motion == 'wait':
+            child_support_draft_template_download
+          else:
+            number_of_children
+            child_support_draft_template_download
     else:
-      child_support_draft_template_download
-  #  number_of_steps
-  #  set_progress(70)
+      if after_courtview == 'open':						
+        if user_role_in_case == 'defendant':							
+          need_to_respond
+          if interim_motion == 'wait':						
+            if general_information_about_forms:					
+                number_of_children
+            else:
+              child_support_draft_template_download
+          else:						
+            number_of_children
+            child_support_draft_template_download				
+        elif user_role_in_case == 'closed':							
+          child_support_draft_template_download						
+      # set_progress(14)								
+        else:							
+          if interim_motion == 'wait':						
+            if general_information_about_forms:					
+              number_of_children				
+            else:					
+              child_support_draft_template_download				
+          else:						
+            number_of_children					
+            child_support_draft_template_download					
+      # set_progress(28)								
+      elif after_courtview == 'none':								
+        paternity
+        if ask_court_or_cssd == 'cssd':
+          child_support_draft_template_download
+      # set_progress(42)
+        else:
+          parents_married
+          if general_information_about_forms:
+            number_of_children
+            interim_motion
+            child_support_draft_template_download
+    #  set_progress(56)
+          else:
+            interim_motion
+            number_of_children
+            child_support_draft_template_download
+      else:
+        child_support_draft_template_download
+    #  number_of_steps
+    #  set_progress(70)
 
   interview_order_child_support_draft_template = True
 ---
@@ -167,7 +170,7 @@ comment: |
 mandatory: True
 code: |
   #  al_intro_screen
-  asking_for_child_support_intro
+  wants_action_plan
   interview_order_child_support_draft_template
   #  signature_date
   # Store anonymous data for analytics / statistics
@@ -183,12 +186,24 @@ code: |
 comment: |
   This question is used to introduce your interview. Please customize
 id: Asking_for_Child_Support
-continue button field: asking_for_child_support_intro
 question: |
   Asking for Child Support
 subquestion: |
   This Guided Assistant asks you questions and uses your answers to build a Personal Action Plan - a list of steps to help you ask for child support in Alaska.
-  ### Do you have an existing court case? ###
+  
+  This interview can help you find information to:
+  
+	* Ask the court for child support when you start a case.
+	* Ask the court for child support during a case.
+	* Ask the state administrative agency, Child Support Services Division, for child support.
+	* Prove or disprove your child’s biological father, and
+	* Fill out the court’s child support forms.
+fields:  
+  - "Do you want an Action Plan to help you with 1 of these topics?": wants_action_plan
+    label above field: True
+    datatype: yesnoradio
+---
+question: |
   Do you have a court case for custody, divorce, or legal separation?
 fields:
   - no label: existing_case
@@ -197,7 +212,7 @@ fields:
       - Yes: open
       - No: none
       - "I do not know": unknown
-  - What's going on?: user_role_in_case
+  - What is going on?: user_role_in_case
     input type: radio
     choices:
       - "Yes. The other parent started a case and I have to file papers to respond.": defendant
@@ -211,11 +226,7 @@ fields:
      #### <i class="fa-regular fa-lightbulb"></i> What if I need information about getting child support in another state? ####
      Your Personal Action Plan explains how child support works only in Alaska.  To find out about child support in other states find their [court](https://www.ncsc.org/information-and-resources/state-court-websites), [legal aid](https://lawhelp.org), [child support agency or tribal child support agency website](https://www.acf.hhs.gov/css/contact-information/state-and-tribal-child-support-agency-contacts).
 ---
-  #  - "Interview title": interview_title
-  #  - "Wrong path tf": wrong_path_tf
-  #    datatype: yesno
----
-id: Look for your name in Courtview
+id: Courtview
 question: |
   Look for your name in Courtview
 subquestion: |
@@ -296,10 +307,8 @@ fields:
 ---
 id: info about filling out child support forms
 question: |
-  Filling out the court's child support forms
-subquestion: |
   % if (existing_case == 'open' and user_role_in_case != 'closed') or (existing_case == 'unknown' and after_courtview == 'open' and user_role_in_case != 'closed'):
-  Do you want your Personal Action Plan to include directions for filling out the court's child support forms?
+  Do you want your Personal Action Plan to include information to help you fill out the court's child support forms?
   % else:
   Do you want your Personal Action Plan to include information to help you fill out the child support forms when you start your case? 
   % endif
@@ -307,11 +316,9 @@ yesno: general_information_about_forms
 ---
 id: kids
 question: |
-  kids
-subquestion: |
-  How many children will your child support order to cover? 
+  How many children will your child support order cover? 
 fields:
-  - "Number of children?": number_of_children
+  - no label: number_of_children
     input type: radio
     choices:
       - "1 child": one
@@ -330,7 +337,7 @@ id: Paternity
 question: |
   Paternity
 subquestion: |
-  You and your child's other legal parent are responsible for financially supporting your child.  
+ Parents are responsible for financially supporting their children.  
   
   A child's biological father is generally their legal father.
 
@@ -360,10 +367,10 @@ fields:
 ---
 id: Ask CSSD or the Court for a child support order
 question: |
-  Ask CSSD or the Court for a child support order
+  Do you want to ask the court or CSSD to order a child support?
 subquestion: |
   A child support order tells one parent to pay child support to the other parent. 
-  The Alaska court orders child support as part of a Parenting Plan in divorce, custody, dissolution or legal separation cases.  Parenting Plans are sometimes called “custody orders”.  
+  **The Alaska Court** orders child support as part of a Parenting Plan in divorce, custody, dissolution or legal separation cases.  Parenting Plans are sometimes called “custody orders”.  
   A Parenting Plan is a list of decisions about:
   
   *	which parent pays child support, 
@@ -375,11 +382,11 @@ subquestion: |
     *	“How to spend our children’s PFDs?” or 
     *	“Which parent should claim any child tax credits?”  
   
-  The Alaska Child Support Services Division (CSSD) can order child support but does not order Parenting Plans. CSSD child support orders work best if you do not need a Parenting Plan.  
-  What do you want to add to your Personal Action Plan?
+  **The Alaska Child Support Services Division (CSSD)** can order child support but does not order Parenting Plans. CSSD child support orders work best if you do not need a Parenting Plan.  
+  
 fields: 
   - "I want to learn how to ask for child support from:": ask_court_or_cssd
-    # label above field: True
+    label above field: True
     input type: radio
     choices:
   	  - "Alaska Court": court
@@ -391,7 +398,7 @@ fields:
 ---
 id: Ask the court for Child Support
 question: |
-  Ask the court for Child Support
+  Start a court case to ask for child support
 subquestion: |
   % if ask_court_or_cssd == 'both':
   Your Personal Action Plan includes information about how to ask the Alaska Child Support Services Division (CSSD) for a child support order. 
@@ -405,62 +412,6 @@ subquestion: |
 fields: 
   - "Are you married to your children’s other parent?": parents_married
     datatype: yesnoradio
----
-id: Plus general CS
-question: |
-  Plus general CS
-subquestion: |
-  Do you want your Personal Action Plan to include information to help you fill out the child support forms when you start your case? 
-  Yes –  [Affidavit TF] [Order TF]  [affidavit  instructions_tf] [order_instructions_tf]  – Go To kids2 
-  No – Go To Interim child support order 3
-  
-  [Note – Kids 2 is so the user can get general information about forms for starting the case and then tell how many kids and then can be asked if they want interim child support information – if they say yes to both, only need to add about interim motions – do not need to ask how many kids again or give other documents again.  But if they say no, it then asks about interim child support.  I have hopeful you can do it all with logic so each question is only asked once!  I put them multiple times here to be sure you understood the logic.  I am hopeful this is done and we don’t have to discuss language or logic, but if it is not done, please leave in the duplicates until we get it finalized]
-field: plus_general_cs
-datatype: yesnoradio
----
-id: Screen 15
-question: |
-  Screen 15
-fields:
-  - "Number of steps": number_of_steps
-    datatype: integer
-    min: 0
----
-id: Screen 16
-question: |
-  Screen 16
-fields:
-  - "Modify": modify
-    datatype: yesno
-  - "More child tf": more_child_TF
-    datatype: yesno
-  - "One child tf": one_child_tf
-    datatype: yesno
-  - "Basics": basics
-    datatype: yesno
-  - "User role": user_role
-    input type: radio
-    choices:
-      - plaintiff
----
-id: preview child_support_draft_template
-question: |
-  Preview your form before you sign it
-subquestion: |
-  Here is a preview of the form you will sign on the next page.   
-  
-  ${ al_recipient_bundle.as_pdf(key='preview') }
-
-  Click the image to open it in a new tab. Click the "Edit answers" button
-  to edit your answers.
-
-  ${ action_button_html(url_action('review_child_support_draft_template'), label='Edit answers', color='info') }
-  
-  Remember to come back to this window to continue and sign your form.
-continue button field: child_support_draft_template_preview_question    
----
-code: |
-  signature_fields = []
 ---
 id: child support draft template review screen
 event: review_child_support_draft_template

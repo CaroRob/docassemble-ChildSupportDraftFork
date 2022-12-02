@@ -44,7 +44,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.ChildSupportDraftTemplate',
-      version='1.01',
+      version='1.02',
       description=('Asking for Child Support'),
       long_description='# docassemble.ChildSupportDraftTemplate\r\n\r\nAsking for Child Support\r\n\r\n## Author\r\n\r\nCaroline Robinson\r\n\r\n',
       long_description_content_type='text/markdown',
