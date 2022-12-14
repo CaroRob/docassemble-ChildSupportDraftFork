@@ -212,15 +212,6 @@ fields:
       - Yes: open
       - No: none
       - "I do not know": unknown
-  - What is going on?: user_role_in_case
-    input type: radio
-    choices:
-      - "Yes. The other parent started a case and I have to file papers to respond.": defendant
-      - "Yes. I filed papers to start the case and am waiting for the other side to respond.": plaintiff
-      - "Yes.  We have an open case.": joint
-      - "Yes, but the case ended and we got our final paperwork.": closed
-    js show if:
-      val('existing_case') == 'open'
   - note: |
      
      #### <i class="fa-regular fa-lightbulb"></i> What if I need information about getting child support in another state? ####
@@ -243,15 +234,18 @@ fields:
       - Yes: open
       - No: none
       - "I still do not know": unknown
-  - What's going on?: user_role_in_case
+---
+id: open case status
+question: |
+  What is going on in your case?
+fields:
+  - no label: user_role_in_case
     input type: radio
     choices:
-      - "Yes. The other parent started a case and I have to file papers to respond.": defendant
-      - "Yes. I filed papers to start the case and am waiting for the other side to respond.": plaintiff
-      - "Yes.  We have an open case.": joint
-      - "Yes, but the case ended and we got our final paperwork.": closed
-    js show if:
-      val('after_courtview') == 'open'
+      - "The other parent started a case and I have to file papers to respond.": defendant
+      - "I filed papers to start the case and am waiting for the other side to respond.": plaintiff
+      - "We have an open case.": joint
+      - "But the case ended and we got our final paperwork.": closed
 ---
 id: Do you want information about how to fill out the papers you need to respond
 question: |
@@ -297,13 +291,16 @@ fields:
       #### <i class="fa-regular fa-lightbulb"></i> Learn more ####
       An interim order is any order the judge makes before they make the final order or decree. 
       The judge can make short-term decisions about child support, the parenting plan, 
-      % if existing_case == 'open' and user_role_in_case == 'defendant' and need_to_respond: 
+      % if (existing_case == 'open' and user_role_in_case == 'defendant' and need_to_respond) or (existing_case == 'unknown' and after_courtview == 'open' and user_role_in_case == 'defendant' and need_to_respond): 
         % if case_type in('divorce', 'dissolution', 'legal separation'):
-       possession of the family home, attorney fees, spousal support or payment of debts
+       possession of the family home, spousal support or payment of debts, 
+        % endif
+      % elif existing_case == 'none' or (existing_case == 'unknown' and after_courtview == 'none'):
+        % if parents_married:
+       possession of the family home, spousal support or payment of debts, 
         % endif
       % endif
-      . 
-      The final order may be entirely different.
+      and attorney fees. The final order may be entirely different.
 ---
 id: info about filling out child support forms
 question: |
@@ -369,7 +366,12 @@ id: Ask CSSD or the Court for a child support order
 question: |
   Do you want to ask the court or CSSD to order a child support?
 subquestion: |
-  A child support order tells one parent to pay child support to the other parent. 
+  % if paternity:
+  Your action plan includes information about "establishing paternity" and "disestablishing paternity."
+  % endif
+  
+  A child support order tells one parent to pay child support to the other parent.
+  
   **The Alaska Court** orders child support as part of a Parenting Plan in divorce, custody, dissolution or legal separation cases.  Parenting Plans are sometimes called “custody orders”.  
   A Parenting Plan is a list of decisions about:
   
