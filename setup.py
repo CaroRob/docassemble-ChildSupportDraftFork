@@ -54,7 +54,7 @@ setup(name='docassemble.ChildSupportDraftTemplate',
       url='https://courtformsonline.org',
       packages=find_packages(),
       namespace_packages=['docassemble'],
-      install_requires=['docassemble.AssemblyLine>=2.19.0'],
+      install_requires=[],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/ChildSupportDraftTemplate/', package='docassemble.ChildSupportDraftTemplate'),
      )

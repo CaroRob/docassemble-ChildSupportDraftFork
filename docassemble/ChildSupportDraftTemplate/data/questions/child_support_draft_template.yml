@@ -2,7 +2,11 @@
 include:
   - docassemble.AssemblyLine:assembly_line.yml
   - docassemble.AKA2JBranding:custom_organization.yml
+  - accordion_steps.yml
   - bundling_forms_for_downloading.yml
+---
+features:
+  css: collapse.css
 ---
 metadata:
   title: |
@@ -72,6 +76,7 @@ code: |
   nav.set_section("review_child_support_draft_template")
   user_role = "na"
   if not wants_action_plan:
+    get_steps
     child_support_draft_template_download
   else:
     if existing_case == 'open':						
@@ -80,13 +85,18 @@ code: |
         if interim_motion == 'wait':						
           if general_information_about_forms:					
              number_of_children
+             get_steps
              child_support_draft_template_download
           else:
+            get_steps
             child_support_draft_template_download
         else:						
-          number_of_children
+          get_steps
+          number_of_children					
+          get_steps
           child_support_draft_template_download				
-      elif user_role_in_case == 'closed':							
+      elif user_role_in_case == 'closed':					
+        get_steps							
         child_support_draft_template_download						
     # set_progress(14)								
       else:							
@@ -102,18 +112,22 @@ code: |
     elif existing_case == 'none':								
       paternity
       if ask_court_or_cssd == 'cssd':
+        get_steps
         child_support_draft_template_download
       else:
         parents_married
         if general_information_about_forms:
           number_of_children
           interim_motion
+          get_steps
           child_support_draft_template_download
         else:
           if interim_motion == 'wait':
+            get_steps
             child_support_draft_template_download
           else:
             number_of_children
+            get_steps
             child_support_draft_template_download
     else:
       if after_courtview == 'open':						
@@ -461,22 +475,22 @@ review:
       **User role**:
       ${ user_role }
 ---
-id: download child_support_draft_template
-event: child_support_draft_template_download
-question: |
-  Your Personal Action Plan is ready!
-subquestion: |
-  You can see, download (and eventually send) your plan.
-   ${ al_user_bundle.download_list_html() }
-buttons:
-  - Start over: restart  
-progress: 100
-comment: |
-  Thank you ${users}. Your form is ready to download and deliver.  
-  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
-  ${ action_button_html(url_action('review_child_support_draft_template'), label='Edit answers', color='info') }  
-  ${ al_user_bundle.download_list_html() }
-  ${ al_user_bundle.send_button_html(show_editable_checkbox=True) }
+#  id: download child_support_draft_template
+#  event: child_support_draft_template_download
+#  question: |
+#    Your Personal Action Plan is ready!
+#  subquestion: |
+#    You can see, download (and eventually send) your plan.
+#     ${ al_user_bundle.download_list_html() }
+#  buttons:
+#    - Start over: restart  
+#  progress: 100
+#  comment: |
+#    Thank you ${users}. Your form is ready to download and deliver.  
+#    View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+#    ${ action_button_html(url_action('review_child_support_draft_template'), label='Edit answers', color='info') }  
+#    ${ al_user_bundle.download_list_html() }
+#    ${ al_user_bundle.send_button_html(show_editable_checkbox=True) }
 ---
 # ALDocument objects specify the metadata for each template
 objects:

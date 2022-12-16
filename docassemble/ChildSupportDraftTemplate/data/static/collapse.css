@@ -1,0 +1,13 @@
+.collapse .card {
+  background-color: transparent !important;
+  border: none;
+}
+.pdcaretopen, .pdcaretclosed, a[data-bs-toggle="collapse"]  {
+  font-size: 1.7rem;
+  text-decoration: none;
+}
+
+.step-subheading {
+  font-size: 1.3rem;
+  font-weight: bold; 
+}
