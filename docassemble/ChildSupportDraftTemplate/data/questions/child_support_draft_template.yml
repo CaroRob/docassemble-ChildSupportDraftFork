@@ -5,9 +5,6 @@ include:
   - accordion_steps.yml
   - bundling_forms_for_downloading.yml
 ---
-features:
-  css: collapse.css
----
 metadata:
   title: |
     Asking for Child Support in Alaska
@@ -63,9 +60,9 @@ objects:
   #  - users: ALPeopleList.using(ask_number=True,target_number=1)
   - users: ALPeopleList.using(there_are_any=False)
 ---
-sections:
-  - review_child_support_draft_template: Review your answers
----
+# sections:
+#   - review_child_support_draft_template: Review your answers
+# ---
 #################### Interview order #####################
 comment: |
   Controls order and branching logic for questions specific to this form
@@ -73,7 +70,7 @@ id: interview_order_child_support_draft_template
 code: |
   # Set the allowed courts for this interview
   # allowed_courts = interview_metadata["child_support_draft_template"]["allowed courts"]
-  nav.set_section("review_child_support_draft_template")
+  # nav.set_section("review_child_support_draft_template")
   user_role = "na"
   if not wants_action_plan:
     get_steps
