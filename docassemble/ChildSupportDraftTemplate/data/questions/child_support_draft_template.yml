@@ -214,6 +214,7 @@ fields:
     label above field: True
     datatype: yesnoradio
 ---
+id: do you have an existing family law case
 question: |
   Do you have a court case for custody, divorce, or legal separation?
 fields:
@@ -256,7 +257,7 @@ fields:
       - "The other parent started a case and I have to file papers to respond.": defendant
       - "I filed papers to start the case and am waiting for the other side to respond.": plaintiff
       - "We have an open case.": joint
-      - "But the case ended and we got our final paperwork.": closed
+      - "The case ended and we got our final paperwork.": closed
 ---
 id: Do you want information about how to fill out the papers you need to respond
 question: |
