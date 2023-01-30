@@ -46,7 +46,7 @@ code: |
   AL_DEFAULT_STATE = "AK"
 ---
 code: |
-  github_repo_name =  'docassemble-ChildSupportDraftTemplate'
+  github_repo_name =  'docassemble-AskingForChildSupportIssues'
 ---
 code: |
   interview_short_title = "Asking for Child Support in Alaska"
